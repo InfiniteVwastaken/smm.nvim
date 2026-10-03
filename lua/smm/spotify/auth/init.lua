@@ -18,7 +18,7 @@ local function get_oauth_info()
     scope = table.concat(config.get().scope, ' '),
     code_challenge_method = 'S256',
     code_challenge = code_challenge,
-    redirect_uri = config.get().callback_url .. ':' .. config.get().callback_port,
+    redirect_uri = config.get().callback_url,
     state = state,
   }
 

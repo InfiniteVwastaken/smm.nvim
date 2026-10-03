@@ -49,8 +49,8 @@ The following are the default configurations. The only required ones are the `sp
          api_retry_backoff = 2000,
          auth = {                         -- These are the only absolutely required configurations.
             client_id = '<your client id>',
-            callback_url = '<your callback URL>',
-            callback_port = '<your callback port>',
+            callback_url = 'http://127.0.0.1:54322/callback', -- Must match the redirect URI registered with Spotify
+            callback_port = 54322,                           -- Must match the port in callback_url
          },
       },
    },
