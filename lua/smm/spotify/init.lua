@@ -71,7 +71,7 @@ function M.authenticate()
   local refresh_token = token.load_refresh_token()
 
   if not refresh_token then
-    logger.info 'No refresh token found - initiating OAuth Flow'
+    logger.info 'No refresh token found - initiating Fixed OAuth Flow'
     M.auth_info = auth.initiate_oauth_flow()
   else
     M.auth_info = auth.refresh_access_token(refresh_token)
