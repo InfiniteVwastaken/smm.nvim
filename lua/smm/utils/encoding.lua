@@ -2,6 +2,12 @@ local logger = require 'smm.utils.logger'
 
 local M = {}
 
+local function encode_query_component(value)
+  return (tostring(value):gsub('[^%w%-._~]', function(char)
+    return string.format('%%%02X', char:byte())
+  end))
+end
+
 ---@param query_table table
 ---@return string
 function M.encode_table_as_query(query_table)
@@ -13,7 +19,7 @@ function M.encode_table_as_query(query_table)
 
   local query_parts = {}
   for k, v in pairs(query_table) do
-    table.insert(query_parts, k .. '=' .. vim.uri_encode(tostring(v)))
+    table.insert(query_parts, encode_query_component(k) .. '=' .. encode_query_component(v))
   end
 
   if #query_parts == 0 then
