@@ -29,7 +29,7 @@ function M.open_browser(url)
     return
   end
 
-  if platform == 'Windows' then
+  if platform == 'Windows_NT' or platform == 'Windows' then
     vim.fn.system { 'cmd', '/c', 'start', url }
     return
   end
