@@ -30,7 +30,7 @@ function M.open_browser(url)
   end
 
   if platform == 'Windows_NT' or platform == 'Windows' then
-    vim.fn.system { 'cmd', '/c', 'start', url }
+    vim.fn.system { 'explorer.exe', url }
     return
   end
 end
