@@ -33,16 +33,20 @@ function M.derive_encryption_key()
   return vim.fn.sha256('smm.nvim:v1:' .. machine_id .. ':' .. home)
 end
 
-local function write_restricted_temp(content, binary_mode)
+local function write_restricted_temp(content)
   local path = vim.fn.tempname()
-  -- Create the file with mode 600 before writing sensitive content
-  vim.fn.system { 'install', '-m', '600', '/dev/null', path }
-  local f = io.open(path, binary_mode and 'wb' or 'w')
-  if not f then
+  local fd = vim.uv.fs_open(path, 'wx', 384)
+  if not fd then
     return nil
   end
-  f:write(content)
-  f:close()
+
+  local bytes_written = vim.uv.fs_write(fd, content, 0)
+  local closed = vim.uv.fs_close(fd)
+  if bytes_written ~= #content or not closed then
+    os.remove(path)
+    return nil
+  end
+
   return path
 end
 
@@ -50,13 +54,13 @@ end
 ---@param key string hex-encoded 256-bit key from derive_encryption_key()
 ---@return string|nil base64-encoded ciphertext (salt+IV embedded by openssl)
 function M.encrypt_aes256(plaintext, key)
-  local input_path = write_restricted_temp(plaintext, true)
+  local input_path = write_restricted_temp(plaintext)
   if not input_path then
     logger.error 'encrypt_aes256: cannot create plaintext temp file'
     return nil
   end
 
-  local key_path = write_restricted_temp(key, false)
+  local key_path = write_restricted_temp(key)
   if not key_path then
     os.remove(input_path)
     logger.error 'encrypt_aes256: cannot create key temp file'
@@ -97,13 +101,13 @@ end
 ---@param key string hex-encoded 256-bit key from derive_encryption_key()
 ---@return string|nil plaintext
 function M.decrypt_aes256(ciphertext, key)
-  local input_path = write_restricted_temp(ciphertext, false)
+  local input_path = write_restricted_temp(ciphertext)
   if not input_path then
     logger.error 'decrypt_aes256: cannot create ciphertext temp file'
     return nil
   end
 
-  local key_path = write_restricted_temp(key, false)
+  local key_path = write_restricted_temp(key)
   if not key_path then
     os.remove(input_path)
     logger.error 'decrypt_aes256: cannot create key temp file'
