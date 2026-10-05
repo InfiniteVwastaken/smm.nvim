@@ -70,17 +70,24 @@ end
 function M.authenticate()
   local refresh_token = token.load_refresh_token()
 
+  local auth_info
   if not refresh_token then
     logger.info 'No refresh token found - initiating Fixed OAuth Flow'
-    M.auth_info = auth.initiate_oauth_flow()
+    auth_info = auth.initiate_oauth_flow()
   else
-    M.auth_info = auth.refresh_access_token(refresh_token)
+    auth_info = auth.refresh_access_token(refresh_token)
   end
 
+  if not auth_info then
+    logger.warn 'Spotify authentication failed; playback was not started'
+    return false
+  end
+
+  M.auth_info = auth_info
   check_and_update_account_type()
 
-  token.delete_refresh_token()
   token.save_refresh_token(M.auth_info.refresh_token)
+  return true
 end
 
 ---@param user_config SMM_SpotifyConfig

@@ -18,6 +18,11 @@ end
 
 local function auth()
   local auth_info = require('smm.spotify.auth').initiate_oauth_flow()
+  if not auth_info then
+    logger.warn 'Spotify authorization did not complete; the saved refresh token was left unchanged'
+    return
+  end
+
   require('smm.spotify').auth_info = auth_info
 
   local token = require 'smm.spotify.token'

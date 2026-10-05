@@ -58,7 +58,7 @@ end
 function M.refresh_access_token(refresh_token)
   local auth_info = requests.refresh_access_token(refresh_token)
   if not auth_info then
-    logger.error 'Unable to refresh token'
+    logger.warn 'Unable to refresh Spotify access token'
     return
   end
   return auth_info

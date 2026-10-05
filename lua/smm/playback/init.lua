@@ -142,7 +142,9 @@ function M.toggle_window()
   end
 
   -- Authenticate with Spotify before starting
-  spotify.authenticate()
+  if not spotify.authenticate() then
+    return
+  end
 
   logger.debug 'Showing playback window'
 
