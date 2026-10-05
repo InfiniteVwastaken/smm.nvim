@@ -86,7 +86,7 @@ function M.start_server(port, state)
         local request = data
         local error = request:match 'error=([^%s&]+)'
         oauth_code = request:match 'code=([^%s&]+)'
-        local returned_state = request:match 'state=([^%s]+)'
+        local returned_state = request:match 'state=([^%s&]+)'
 
         local response = ''
 
@@ -103,6 +103,7 @@ Content-Type: text/html
           client:close()
           server:close()
           logger.error 'CSRF state mismatch - this could indicate a security issue'
+          return
         end
 
         if error ~= nil then
